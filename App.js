@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 
-import { Animated, TouchableOpacity, Easing, Pressable, Dimensions } from 'react-native';
+import { Animated, TouchableOpacity, Easing, Pressable, Dimensions, PanResponder } from 'react-native';
 
 import styled from 'styled-components/native';
 
@@ -20,46 +20,37 @@ const Box = styled.View`
 const AnimatedBox = Animated.createAnimatedComponent(Box)
 
 export default function App() {
-  const [up, setUp] = useState(false);
-  const POSITION = useRef(new Animated.ValueXY({ x: -SCREEN_WIDTH / 2 + 100, y: -SCREEN_HEIGHT / 2 + 100 })).current;
-  const toggleUp = () => setUp((prev) => !prev)
+  const POSITION = useRef(new Animated.ValueXY({
+    // x: -SCREEN_WIDTH / 2 + 100,
+    // y: -SCREEN_HEIGHT / 2 + 100
+    x: 0,
+    y: 0
+  })).current;
 
-  const topLeft = Animated.timing(POSITION, {
-    toValue: {
-      x: -SCREEN_WIDTH / 2 + 100,
-      y: -SCREEN_HEIGHT / 2 + 100,
-    },
-    useNativeDriver: false,
-  });
-  const bottomLeft = Animated.timing(POSITION, {
-    toValue: {
-      x: -SCREEN_WIDTH / 2 + 100,
-      y: +SCREEN_HEIGHT / 2 - 100,
-    },
-    useNativeDriver: false,
-  });
-  const bottomRight = Animated.timing(POSITION, {
-    toValue: {
-      x: +SCREEN_WIDTH / 2 - 100,
-      y: +SCREEN_HEIGHT / 2 - 100,
-    },
-    useNativeDriver: false,
-  });
-  const topRight = Animated.timing(POSITION, {
-    toValue: {
-      x: +SCREEN_WIDTH / 2 - 100,
-      y: -SCREEN_HEIGHT / 2 + 100,
-    },
-    useNativeDriver: false,
-  });
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, { dx, dy }) => {
+        POSITION.setValue({
+          x: dx,
+          y: dy,
+        })
+      },
+      onPanResponderRelease: () => {
+        Animated.spring(POSITION, {
+          toValue: {
+            x: 0,
+            y: 0
+          },
+          bounciness: 200,
+          useNativeDriver: false,
+        }).start()
+      }
+    })
+  ).current;
 
   const moveUp = () => {
-    Animated.loop(Animated.sequence([
-      bottomLeft,
-      bottomRight,
-      topRight,
-      topLeft
-    ])).start()
+
   }
 
   const borderRadius = POSITION.y.interpolate({
@@ -83,6 +74,7 @@ export default function App() {
         onPress={moveUp}
       >
         <AnimatedBox
+          {...panResponder.panHandlers}
           style={{
             backgroundColor: bgColor,
             transform: [
