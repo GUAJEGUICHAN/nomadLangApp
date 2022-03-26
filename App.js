@@ -24,17 +24,17 @@ const AnimatedCard = styled(Animated.createAnimatedComponent(View))`
 const BtnContainer = styled.View`
 flex:1;
   transform: translate(0, -100px);
-display:flex;
-flex-direction:row;
+  display:flex;
+  flex-direction:row;
 `
 const Btn = styled(Animated.createAnimatedComponent(View))`
   margin:10px;
 `
 
 const CardContainer = styled.View`
-flex:3;
-justify-content:center;
-align-items:center;
+  flex:3;
+  justify-content:center;
+  align-items:center;
 `
 
 export default function App() {
